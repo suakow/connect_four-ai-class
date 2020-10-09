@@ -7,10 +7,12 @@ max_depth = 12
 state = ([],[],[],[],[],[],[])
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-f', '--first', action='store_false') 
+parser.add_argument('-f', '--first', action='store_false')
+parser.add_argument('-d', '--depth', action='store', dest='depth', default=4, type=int) 
 args = parser.parse_args()
 
 is_white_turn = args.first
+set_depth = args.depth
 
 def push(col,chip,state):
     if len(state[col]) >= 6:
@@ -160,7 +162,7 @@ def max_value_function(state,a,b,level):
     return v
 
 def alpha_beta_decision(state):
-    global max_depth
+    global max_depth, set_depth
     s_res = sum([len(c) for c in list(state)])
     # First turn of computer -> 
     if s_res == 1 :
@@ -175,13 +177,17 @@ def alpha_beta_decision(state):
     elif s_res == 0:
         return 3
     if s_res < 5:
-        max_depth = 4
+        max_depth = set_depth
     elif s_res < 12:
-        max_depth = 6
+        # max_depth = 6
+        max_depth = set_depth
     elif s_res < 24:
-        max_depth = 8
+        # max_depth = 8
+        max_depth = set_depth
     else:
-        max_depth = 10
+        # max_depth = 10
+        max_depth = set_depth
+
     max_value = -100
     a,b=-10,10
     min_score=[]
@@ -221,6 +227,7 @@ while sum([len(c) for c in list(state)]) != 42:
         while len(state[c-1]) == 6:
             print('You cannot put in column',c)
             c = int(input('Please enter your column:'))
+        print('W Turn : %s'%(c))
         push(c-1,'W',state)
         if is_win(state,'W')[2] == 4:
             print('You win!!!')
@@ -230,7 +237,7 @@ while sum([len(c) for c in list(state)]) != 42:
     else:
         cal_start_time = time.time()
         c = alpha_beta_decision(state)
-        print('c', c)
+        print('B Turn : %s'%(c+1))
         push(c,'B',state)
         show_state(state)
         print("*calculation time : %s seconds" % (time.time() - cal_start_time))
